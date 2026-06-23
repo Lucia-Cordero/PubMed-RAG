@@ -15,8 +15,8 @@ def _img_b64(path):
     with open(path, "rb") as f:
         return base64.b64encode(f.read()).decode()
 
-_RAG_B64 = _img_b64("/home/lucia/code/Lucia-Cordero/12-PubMed_RAG/RAG_LLM_pipeline_scheme.png")
-_LLM_B64 = _img_b64("/home/lucia/code/Lucia-Cordero/12-PubMed_RAG/LLM_pipeline_scheme.png")
+_RAG_B64 = _img_b64("RAG_LLM_pipeline_scheme.png")
+_LLM_B64 = _img_b64("LLM_pipeline_scheme.png")
 
 st.set_page_config(page_title="PubMed RAG Explorer", layout="wide")
 
