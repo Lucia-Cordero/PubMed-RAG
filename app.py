@@ -508,7 +508,7 @@ st.markdown("<hr class='divider' style='margin:1rem 0 0.75rem'/>", unsafe_allow_
 st.markdown("""<div class="section-label-row">
   <span class="step-badge-q">Step 5a</span>
   <span class="section-label-text-q">In-scope query</span>
-  <span style="font-size:0.68rem; color:#94A3B8; margin-left:0.4rem;">ask a question related to your topic to the LLM</span>
+  <span style="font-size:0.68rem; color:#94A3B8; margin-left:0.4rem;">ask a question to the LLM, it must be related to your topic</span>
 
 </div>""", unsafe_allow_html=True)
 question = st.text_input("question",
@@ -518,7 +518,7 @@ question = st.text_input("question",
 st.markdown("""<div class="section-label-row" style="margin-top:0.5rem;">
   <span class="step-badge-stress">Step 5b</span>
   <span class="section-label-text-stress">Out-of-scope query</span>
-  <span style="font-size:0.68rem; color:#94A3B8; margin-left:0.4rem;">ask a question NOT related to your topic to the LLM</span>
+  <span style="font-size:0.68rem; color:#94A3B8; margin-left:0.4rem;">ask a question to the LLM, it must NOT related to your topic</span>
 </div>""", unsafe_allow_html=True)
 oos_question = st.text_input("oos_question",
                              value="Why are cats afraid of cucumbers?",
