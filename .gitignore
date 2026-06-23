@@ -1,0 +1,9 @@
+# Credentials
+.env
+
+# Supporting data
+.pptx
+
+# Notebooks
+.ipynb
+.env
