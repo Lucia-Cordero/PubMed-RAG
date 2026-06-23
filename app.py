@@ -426,7 +426,7 @@ def normalise_headings(text):
 # ── Header ──────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div style="font-family:'Inter',sans-serif; font-size:1.75rem; font-weight:700; color:#1A1D23; letter-spacing:-0.02em; line-height:1.2; margin-bottom:0.25rem; padding-top:0.5rem;">PubMed RAG Explorer</div>
-<div style="font-family:'Inter',sans-serif; font-size:0.88rem; color:#64748B; margin-bottom:1rem;">Compare retrieval-augmented generation against a plain LLM on live scientific literature.</div>
+<div style="font-family:'Inter',sans-serif; font-size:0.88rem; color:#64748B; margin-bottom:1rem;">Compare retrieval-augmented generation (RAG) against a plain LLM on live scientific literature.</div>
 """, unsafe_allow_html=True)
 
 # ── About — instant HTML details/summary ─────────────────────────────────────
@@ -521,7 +521,7 @@ st.markdown("""<div class="section-label-row" style="margin-top:0.5rem;">
   <span style="font-size:0.68rem; color:#94A3B8; margin-left:0.4rem;">ask a question NOT related to your topic to the LLM</span>
 </div>""", unsafe_allow_html=True)
 oos_question = st.text_input("oos_question",
-                             value="How can you avoid immune rejection of allogeneic hepatic cells in liver cell therapy?",
+                             value="Why are cats afraid of cucumbers?",
                              label_visibility="collapsed",
                              help="RAG should decline; the LLM will answer confidently — that contrast is the point.")
 
@@ -574,75 +574,65 @@ if search and topic and question and oos_question:
 
 # ── Results ──────────────────────────────────────────────────────────────────────
 if st.session_state.get("corpus_built"):
+    st.markdown("""<div class="section-label-row" style="margin-top:0.5rem;">
+    <span class="step-badge-rag">Step 7a</span><span class="step-badge-llm">Step 7a</span>
+    <span class="section-label-text-stress">Answers</span>
+    </div>""", unsafe_allow_html=True)
 
-    st.markdown("""
-    <details class="result-details" open>
-      <summary>
-        <span class="step-badge-rag">Step 7a</span>
-        <span class="step-badge-llm" style="background:#0F2D45;">Step 7a</span>
-        <span class="result-summary-label">In-scope query results</span>
-        <span class="result-chevron">▼</span>
-      </summary>
-      <div class="result-note">LLM + RAG grounds its answer in retrieved abstracts and cites sources. The LLM answers from training data — broader but unverifiable.</div>
-    </details>
-    """, unsafe_allow_html=True)
-    r1, r2 = st.columns(2)
-    with r1:
-        st.markdown("""<div class="section-label-row">
-          <span class="step-badge-rag">Step 7a</span>
-          <span class="section-label-text-rag">LLM + RAG — Answer (cited)</span>
-        </div>""", unsafe_allow_html=True)
-        rag_body = normalise_headings(st.session_state.get("rag_body",""))
-        rag_refs = st.session_state.get("rag_refs")
-        st.markdown(rag_body)
-        if rag_refs:
-            import re as _re
-            clean_refs = rag_refs.replace('## References', 'References').replace('### References', 'References').replace('**References**', 'References')
-            clean_refs = _re.sub(r'\s*(\[Source \d+\])', r'<br>\1', clean_refs).lstrip('<br>')
-            st.markdown(f'<div class="references-block">{clean_refs}</div>', unsafe_allow_html=True)
-    with r2:
-        st.markdown("""<div class="section-label-row">
-          <span class="step-badge-llm">Step 7a</span>
-          <span class="section-label-text-llm">LLM — Answer (uncited)</span>
-        </div>""", unsafe_allow_html=True)
-        plain_raw = normalise_headings(st.session_state.get("plain_raw",""))
-        st.markdown(plain_raw)
-        st.markdown('<div class="no-sources-block">No sources cited — answer from training data only. Claims cannot be verified.</div>', unsafe_allow_html=True)
-    st.markdown("<div style='height:0.75rem'></div>", unsafe_allow_html=True)
+    with st.expander("Results", expanded=True):
+        st.markdown('<p class="expander-note">LLM + RAG grounds its answer in retrieved abstracts and cites sources. The LLM answers from training data — broader but unverifiable.</p>', unsafe_allow_html=True)
+        r1, r2 = st.columns(2)
+        with r1:
+            st.markdown("""<div class="section-label-row">
+              <span class="step-badge-rag">Step 7a</span>
+              <span class="section-label-text-rag">LLM + RAG — Answer (cited)</span>
+            </div>""", unsafe_allow_html=True)
+            rag_body = normalise_headings(st.session_state.get("rag_body",""))
+            rag_refs = st.session_state.get("rag_refs")
+            st.markdown(rag_body)
+            if rag_refs:
+                import re as _re
+                clean_refs = rag_refs.replace('## References', 'References').replace('### References', 'References').replace('**References**', 'References')
+                clean_refs = _re.sub(r'\s*(\[Source \d+\])', r'<br>\1', clean_refs).lstrip('<br>')
+                st.markdown(f'<div class="references-block">{clean_refs}</div>', unsafe_allow_html=True)
+        with r2:
+            st.markdown("""<div class="section-label-row">
+              <span class="step-badge-llm">Step 7a</span>
+              <span class="section-label-text-llm">LLM — Answer (uncited)</span>
+            </div>""", unsafe_allow_html=True)
+            plain_raw = normalise_headings(st.session_state.get("plain_raw",""))
+            st.markdown(plain_raw)
+            st.markdown('<div class="no-sources-block">No sources cited — answer from training data only. Claims cannot be verified.</div>', unsafe_allow_html=True)
 
-    st.markdown("""
-    <details class="result-details">
-      <summary>
-        <span class="step-badge-stress">Step 7b</span>
-        <span class="step-badge-llm" style="background:#0F2D45;">Step 7b</span>
-        <span class="result-summary-label">Stress test results — out-of-scope question</span>
-        <span class="result-chevron">▼</span>
-      </summary>
-      <div class="result-note">RAG should recognise the question falls outside its corpus and say so. The LLM answers confidently regardless — that contrast illustrates RAG's key advantage: <em>knowing what it doesn't know.</em></div>
-    </details>
-    """, unsafe_allow_html=True)
-    s1, s2 = st.columns(2)
-    with s1:
-        st.markdown("""<div class="section-label-row">
-          <span class="step-badge-rag">Step 7b</span>
-          <span class="section-label-text-rag">LLM + RAG — Answer (cited)</span>
-        </div>""", unsafe_allow_html=True)
-        oos_rag_body = normalise_headings(st.session_state.get("oos_rag_body",""))
-        oos_rag_refs = st.session_state.get("oos_rag_refs")
-        st.markdown(oos_rag_body)
-        if oos_rag_refs:
-            import re as _re
-            clean_oos_refs = oos_rag_refs.replace('## References', 'References').replace('### References', 'References').replace('**References**', 'References')
-            clean_oos_refs = _re.sub(r'\s*(\[Source \d+\])', r'<br>\1', clean_oos_refs).lstrip('<br>')
-            st.markdown(f'<div class="references-block">{clean_oos_refs}</div>', unsafe_allow_html=True)
-    with s2:
-        st.markdown("""<div class="section-label-row">
-          <span class="step-badge-llm">Step 7b</span>
-          <span class="section-label-text-llm">LLM — Answer (uncited)</span>
-        </div>""", unsafe_allow_html=True)
-        oos_plain = normalise_headings(st.session_state.get("oos_plain",""))
-        st.markdown(oos_plain)
-        st.markdown('<div class="no-sources-block">No sources cited — answer from training data only.</div>', unsafe_allow_html=True)
+    st.markdown("""<div class="section-label-row" style="margin-top:0.5rem;">
+    <span class="step-badge-rag">Step 7b</span><span class="step-badge-llm">Step 7b</span>
+    <span class="section-label-text-stress">Answers</span>
+    </div>""", unsafe_allow_html=True)
+
+    with st.expander("Results"):
+        st.markdown('<p class="expander-note">RAG should recognise the question falls outside its corpus and say so. The LLM answers confidently regardless — that contrast illustrates RAG&#39;s key advantage: <em>knowing what it doesn&#39;t know.</em></p>', unsafe_allow_html=True)
+        s1, s2 = st.columns(2)
+        with s1:
+            st.markdown("""<div class="section-label-row">
+              <span class="step-badge-rag">Step 7b</span>
+              <span class="section-label-text-rag">LLM + RAG — Answer (cited)</span>
+            </div>""", unsafe_allow_html=True)
+            oos_rag_body = normalise_headings(st.session_state.get("oos_rag_body",""))
+            oos_rag_refs = st.session_state.get("oos_rag_refs")
+            st.markdown(oos_rag_body)
+            if oos_rag_refs:
+                import re as _re
+                clean_oos_refs = oos_rag_refs.replace('## References', 'References').replace('### References', 'References').replace('**References**', 'References')
+                clean_oos_refs = _re.sub(r'\s*(\[Source \d+\])', r'<br>\1', clean_oos_refs).lstrip('<br>')
+                st.markdown(f'<div class="references-block">{clean_oos_refs}</div>', unsafe_allow_html=True)
+        with s2:
+            st.markdown("""<div class="section-label-row">
+              <span class="step-badge-llm">Step 7b</span>
+              <span class="section-label-text-llm">LLM — Answer (uncited)</span>
+            </div>""", unsafe_allow_html=True)
+            oos_plain = normalise_headings(st.session_state.get("oos_plain",""))
+            st.markdown(oos_plain)
+            st.markdown('<div class="no-sources-block">No sources cited — answer from training data only.</div>', unsafe_allow_html=True)
 
 if search and (not topic or not question or not oos_question):
     st.warning("Please fill in the topic and both question fields before searching.")
