@@ -288,7 +288,8 @@ def fetch_pubmed_abstracts_batched(query, max_results=20, batch_size=20):
         batch = ids[i:i+batch_size]
         all_text += requests.get(
             "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
-            params={"db":"pubmed","id":",".join(batch),"rettype":"abstract","retmode":"text","api_key":NCBI_API_KEY}
+            params={"db":"pubmed","id":",".join(batch),"rettype":"abstract","retmode":"text","api_key":NCBI_API_KEY},
+            timeout=30
         ).text
         time.sleep(0.5)
     return all_text
