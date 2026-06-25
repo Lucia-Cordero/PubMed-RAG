@@ -486,7 +486,7 @@ with col_rag:
     st.markdown("""<div class="section-label-row">
       <span class="step-badge-rag">Step 1</span>
       <span class="section-label-text-rag">Your topic</span>
-      <span style="font-size:0.68rem; color:#94A3B8; margin-left:0.4rem;">choose a field of scientific research, the tool will then fetch abstracts from <a class="pubmed-link" href="https://pubmed.ncbi.nlm.nih.gov" target="_blank">PubMed</a>
+      <span style="font-size:0.68rem; color:#94A3B8; margin-left:0.4rem;">enter key words to run a search on <a class="pubmed-link" href="https://pubmed.ncbi.nlm.nih.gov" target="_blank">PubMed</a>
     </span>
     </div>""", unsafe_allow_html=True)
 
