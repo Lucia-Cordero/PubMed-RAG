@@ -277,7 +277,7 @@ def load_embedding_model():
 def fetch_pubmed_abstracts_batched(query, max_results=20, batch_size=20):
     resp = requests.get(
         "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
-        params={"db":"pubmed","term":query,"retmax":max_results,"retmode":"json","api_key":NCBI_API_KEY},
+        params={"db":"pubmed","term":query,"retmax":max_results,"retmode":"json", "sort":"date", "api_key":NCBI_API_KEY},
         timeout=30
     ).json()
     ids = resp.get("esearchresult", {}).get("idlist", [])
