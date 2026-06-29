@@ -16,10 +16,11 @@ import requests
 import os
 
 
-def fetch_pubmed_abstracts_batched(query, ncbi_api_key, max_results=20, batch_size=20):
+def fetch_pubmed_abstracts_batched(query, ncbi_api_key, max_results=20, batch_size=20, sort="relevance"):
     resp = requests.get(
         "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
-        params={"db":"pubmed","term":query,"retmax":max_results,"retmode":"json", "sort":"date", "api_key":ncbi_api_key},
+        params={"db":"pubmed","term":query,"retmax":max_results,"retmode":"json",
+                "sort":sort,"api_key":ncbi_api_key},
         timeout=30
     ).json()
     ids = resp.get("esearchresult", {}).get("idlist", [])
