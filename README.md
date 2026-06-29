@@ -2,9 +2,9 @@
 
 > ⚠️ **Proof-of-concept.** This tool fetches live PubMed abstracts and uses them as a retrieval corpus. Results depend on what PubMed returns for your query at the time of search. The architecture, pipeline design, and LLM integration are the demonstrable outputs.
 
-A Streamlit application that compares **retrieval-augmented generation (RAG)** against a plain **LLM** on live scientific literature — side by side, on any topic you choose.
+A Streamlit application that compares **retrieval-augmented generation (RAG)** against a plain **LLM** on live biomedical literature — side by side, on any topic you choose.
 
-🔗 **Live demo:** *([PubMed RAG Explorer](https://pubmed-rag-llm.streamlit.app/))*
+🔗 **Live demo:** *(add Streamlit Cloud URL here)*
 
 ---
 
@@ -31,7 +31,7 @@ The app runs two parallel pipelines on the same question:
 
 A built-in **stress test (Step 5b)** asks a deliberately out-of-scope question — from a different field of medicine. RAG should say it can't answer; the LLM will answer confidently with no accountability. That contrast is the point.
 
-### The caveat
+### The honest caveat
 
 For a well-covered public topic, a plain LLM (or one with web search) may give a similarly good answer. RAG's strongest use case is **private or specialised corpora** — internal trial data, unpublished research, proprietary document sets — where no LLM training data or web search can reach. This prototype demonstrates the architecture on a public corpus for accessibility; the design generalises directly to those higher-value private settings.
 
@@ -57,13 +57,13 @@ Out-of-scope  → Generate (training data only) → Answer (uncited, confident)
 
 ## Features
 
-- **Live PubMed corpus** — fetches 20 recent abstracts on any topic via the NCBI E-utilities API, with proper metadata (authors, year, PubMed URL)
+- **Live PubMed corpus** — fetches 20 recent abstracts on any topic via the NCBI E-utilities API, sorted by date to reflect the most recently indexed literature
 - **Semantic retrieval** — abstracts embedded with `all-MiniLM-L6-v2`, stored in ChromaDB, queried by cosine similarity
 - **Proper citations** — every RAG answer includes a References section with author, year, title, and clickable PubMed URL
 - **Dual query** — Step 5a (in-scope) and Step 5b (stress test) run simultaneously via parallel API calls
 - **Boilerplate cleaning** — abstracts stripped of declarations, competing interests, and copyright notices before embedding
 - **Structured metadata** — titles and authors fetched from PubMed's eSummary endpoint rather than parsed from raw text, for reliability
-- **Defensive error handling** — graceful fallback if PubMed returns unexpected responses for unusual queries
+- **Defensive error handling** —  fallback if PubMed returns unexpected responses for unusual queries
 
 ---
 
@@ -90,6 +90,27 @@ The trade-off: **RAG trades breadth for specificity and provenance.** It's not a
 
 ---
 
+## Retrieval encoder evaluation
+
+A separate notebook (`RAG_Encoder_Evaluation.ipynb`) tests whether domain-specific biomedical encoders improve semantic retrieval over the app's default general-purpose encoder (all-MiniLM-L6-v2), using a factorial design to isolate the contribution of domain specificity and retrieval fine-tuning independently.
+
+| Encoder | Domain-specific | Retrieval fine-tuned |
+|---|---|---|
+| `all-MiniLM-L6-v2` | No | Yes (MS-MARCO) |
+| `microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract` | Yes (PubMed) | No |
+| `pritamdeka/S-PubMedBert-MS-MARCO` | Yes (PubMed) | Yes (MS-MARCO) |
+
+A gold-standard dataset of 20 manually annotated biomedical queries was constructed by a domain expert, spanning oncology, immunology, neuroscience, liver biology, and metabolic disease. Each query has 3–5 original research PMIDs and 1–2 review PMIDs identified manually as directly relevant. Retrieval quality is measured with Precision@5, Recall@5, and MRR.
+
+**Key findings:**
+
+- Retrieval fine-tuning is the dominant factor. PubMedBERT (domain-specific, no retrieval fine-tuning) consistently underperforms MiniLM (general-purpose, retrieval fine-tuned) across all metrics. Domain-specific pretraining alone does not improve retrieval.
+- S-PubMedBERT (domain-specific + retrieval fine-tuned) matches MiniLM on original research retrieval and shows a modest advantage on combined retrieval, suggesting that combining both factors is the right direction — but the gain is incremental at this corpus scale.
+- Query specificity matters more than encoder choice. Queries with distinctive terminology ("cholangiocytes", "AAV serotypes", "trastuzumab") retrieve well regardless of encoder. Broad mechanistic queries fail across all encoders — pointing to corpus design as the primary bottleneck, not the embedding model.
+
+
+---
+
 ## Running locally
 
 ```bash
@@ -112,14 +133,30 @@ Get a free NCBI API key at [ncbi.nlm.nih.gov/account](https://www.ncbi.nlm.nih.g
 
 ## Known limitations and future directions
 
-| Limitation | Impact | Intended fix |
+| Limitation | Impact | Status |
 |---|---|---|
-| General-purpose embedding model | `all-MiniLM-L6-v2` may miss biomedical semantic nuance | Replace with `PubMedBERT` or `BioLORD` |
-| 20-abstract corpus | Rare or niche findings may not surface | Increase corpus size; add hybrid BM25 + semantic retrieval |
+| General-purpose embedding model | `all-MiniLM-L6-v2` may miss biomedical semantic nuance | Evaluated in `RAG_Encoder_Evaluation.ipynb` — retrieval fine-tuning dominates domain specificity; S-PubMedBERT is a marginal improvement |
+| 20-abstract corpus | Rare or niche findings may not surface | Partially addressed by `sort=date` fetch; hybrid BM25 + semantic retrieval would help further |
 | Abstracts only (no full text) | Some answers require full paper content | Integrate PubMed Central full-text API |
 | Public corpus only | Doesn't demonstrate RAG's strongest use case | Extend to private/proprietary document sets |
 | Single LLM (Claude Sonnet) | No model comparison | Add model selector |
-| No retrieval evaluation | Retrieval quality not formally measured | Add a labelled benchmark query set |
+| PubMed keyword search | Natural language topic inputs may reduce corpus quality | UI hint added; user guidance to enter keywords |
+
+---
+
+## Repository structure
+
+```
+PubMed-RAG/
+├── app.py                          — Streamlit application
+├── utils.py                        — shared pipeline functions (fetch, parse, embed)
+├── PubMed_RAG.ipynb                — v1 development notebook
+├── RAG_Encoder_Evaluation.ipynb    — v2 encoder comparison notebook
+├── RAG_LLM_pipeline_scheme.png     — pipeline diagram (LLM + RAG)
+├── LLM_pipeline_scheme.png         — pipeline diagram (LLM alone)
+├── requirements.txt
+└── README.md
+```
 
 ---
 
