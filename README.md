@@ -4,7 +4,7 @@
 
 A Streamlit application that compares **retrieval-augmented generation (RAG)** against a plain **LLM** on live biomedical literature — side by side, on any topic you choose.
 
-🔗 **Live demo:** *(add Streamlit Cloud URL here)*
+🔗 **Live demo:** *[(Streamlit URL](https://pubmed-rag-llm.streamlit.app/)*
 
 ---
 
@@ -31,7 +31,7 @@ The app runs two parallel pipelines on the same question:
 
 A built-in **stress test (Step 5b)** asks a deliberately out-of-scope question — from a different field of medicine. RAG should say it can't answer; the LLM will answer confidently with no accountability. That contrast is the point.
 
-### The honest caveat
+### The caveat
 
 For a well-covered public topic, a plain LLM (or one with web search) may give a similarly good answer. RAG's strongest use case is **private or specialised corpora** — internal trial data, unpublished research, proprietary document sets — where no LLM training data or web search can reach. This prototype demonstrates the architecture on a public corpus for accessibility; the design generalises directly to those higher-value private settings.
 
