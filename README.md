@@ -4,7 +4,7 @@
 
 A Streamlit application that compares **retrieval-augmented generation (RAG)** against a plain **LLM** on live biomedical literature — side by side, on any topic you choose.
 
-🔗 **Live demo:** *[(Streamlit URL](https://pubmed-rag-llm.streamlit.app/)*
+🔗 **Live demo:** *[(PubMed RAG Explorer)](https://pubmed-rag-llm.streamlit.app/)*
 
 ---
 
